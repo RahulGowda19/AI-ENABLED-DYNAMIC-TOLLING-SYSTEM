@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Vehicle Balance</title>
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            margin: auto;
+        }
+
+        h2 {
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+
+        /* Input Fields */
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #FFD700;
+            color: black;
+        }
+
+        .btn-primary:hover {
+            background: #FFC107;
+        }
+
+        /* Balance Result */
+        #balanceResult {
+            margin-top: 20px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🔍 Check Vehicle Balance</h2>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter your username" required>
+
+        <label for="vehicle_number">Vehicle Number:</label>
+        <input type="text" id="vehicle_number" placeholder="Enter vehicle number" required>
+
+        <button class="btn btn-primary" onclick="checkBalance()">💰 Check Balance</button>
+
+        <div id="balanceResult"></div>
+    </div>
+
+    <script>
+        function checkBalance() {
+            let username = document.getElementById("username").value;
+            let vehicle_number = document.getElementById("vehicle_number").value;
+
+            if (!username || !vehicle_number) {
+                alert("🚨 Please enter both username and vehicle number.");
+                return;
+            }
+
+            fetch("/check_balance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: username, vehicle_number: vehicle_number })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("balanceResult").innerText = "Error: " + data.error;
+                } else {
+                    document.getElementById("balanceResult").innerHTML = `
+                        <p><strong>👤 Name:</strong> ${data.name}</p>
+                        <p><strong>🚗 Vehicle Number:</strong> ${data.vehicle_number}</p>
+                        <p><strong>💵 Balance:</strong> ₹${data.balance}</p>
+                    `;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+
+</body>
+</html>
